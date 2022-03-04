@@ -17,7 +17,8 @@ public interface ArticleMapper {
     @Mapping(target="boardName", source="board.name")
     @Mapping(target="boardDisplayName", source="board.displayName")
     // TODO
-//    @Mapping(target="images", source="")
+    // 나중엔 newImages -> images로 컬럼 명 자체를 바꿔야할 듯
+    @Mapping(target="images", source="newImages")
     ArticleDto toDto(Article src);
     Article toEntity(ArticleDto src);
 }

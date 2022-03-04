@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class Article {
+public class Article extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
@@ -24,7 +24,6 @@ public class Article {
     @Column(columnDefinition = "TEXT")
     String content;
     @Convert(converter = JpaConverterJson.class)
-    @Column(name="new_images")
     List<String> newImages;
     @ManyToOne
     @JoinColumn(name="author_id")
@@ -35,6 +34,4 @@ public class Article {
     String kind;
     @Column(name="is_hot")
     Boolean isHot;
-    @CreatedDate
-    LocalDateTime createdAt;
 }
