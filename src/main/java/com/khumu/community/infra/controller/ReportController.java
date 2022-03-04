@@ -6,6 +6,7 @@ import com.khumu.community.application.port.in.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,9 +17,9 @@ public class ReportController {
     @PostMapping(value = "/api/community/v1/report")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.CREATED)
-    public DefaultResponse<ReportDto> report(@RequestParam String user, @RequestBody ReportDto reportDto) {
+    public DefaultResponse<ReportDto> report(@AuthenticationPrincipal User user, @RequestBody ReportDto reportDto) {
         return DefaultResponse.<ReportDto>builder()
-                .data(reportService.report(User.builder().username(user).build(), reportDto))
+                .data(reportService.report(user, reportDto))
                 .build();
     }
 }
