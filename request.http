@@ -1,0 +1,9 @@
+### Send POST request with json body
+POST http://localhost:9003/api/community/v1/report?user=jinsu
+Content-Type: application/json
+
+{
+  "resource_kind": "article",
+  "resource_id": "1",
+  "content": "테스트 삼아 시도한 신고에요."
+}
