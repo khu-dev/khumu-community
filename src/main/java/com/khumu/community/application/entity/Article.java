@@ -1,12 +1,9 @@
 package com.khumu.community.application.entity;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.khumu.community.common.util.JpaConverterJson;
+import com.khumu.community.infra.db.JpaConverterJson;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity(name="article_article")

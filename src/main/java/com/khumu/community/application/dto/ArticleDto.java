@@ -1,13 +1,7 @@
 package com.khumu.community.application.dto;
 
-import com.khumu.community.application.entity.Board;
-import com.khumu.community.application.entity.User;
-import com.khumu.community.common.util.JpaConverterJson;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class ArticleDto implements Serializable {
+public class ArticleDto {
     Integer id;
     String boardName;
     String boardDisplayName;

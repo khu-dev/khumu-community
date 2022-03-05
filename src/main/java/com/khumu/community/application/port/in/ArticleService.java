@@ -8,9 +8,11 @@ import com.khumu.community.application.entity.Board;
 import com.khumu.community.application.entity.FollowBoard;
 import com.khumu.community.application.entity.User;
 import com.khumu.community.application.exception.ForbiddenException;
+import com.khumu.community.application.port.out.messaging.MessagePublisher;
 import com.khumu.community.application.port.out.repository.ArticleRepository;
 import com.khumu.community.application.port.out.repository.FollowBoardRepository;
 import com.khumu.community.common.mapper.ArticleMapper;
+import com.khumu.community.infra.messaging.SnsPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,6 +30,8 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final FollowBoardRepository followBoardRepository;
 
+    private final MessagePublisher messagePublisher;
+
     @Transactional
     public ArticleDto write(User requestUser, CreateArticleRequest input) {
         Article tmp = Article.builder()
@@ -43,6 +47,8 @@ public class ArticleService {
         Article article = articleRepository.save(tmp);
 
         // TODO: 게시글 생성 이벤트를 SNS에 발행하기!
+        messagePublisher.publish("article", "create", articleMapper.toEventDto(article));
+        
         return articleMapper.toDto(article);
     }
 

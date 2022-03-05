@@ -1,12 +1,10 @@
 package com.khumu.community.application.entity;
 
-import com.khumu.community.common.util.JpaConverterJson;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity(name="board_board")
 @AllArgsConstructor

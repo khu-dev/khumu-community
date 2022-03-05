@@ -1,4 +1,4 @@
-package com.khumu.community.common.util;
+package com.khumu.community.infra.db;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
