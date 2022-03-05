@@ -10,10 +10,12 @@
 - 1️⃣ 유저에 대한 차단 기능
 - 게시판에 대한 CRUD
 - 게시판에 대한 Follow / Unfollow
-- 1️⃣ 게시글에 대한 CRUD
-- 1️⃣ 게시글에 대한 Follow / Unfollow
-- 1️⃣ 게시글에 대한 Like / Unlike
-- 1️⃣ 게시글에 대한 Bookmark / Unbookomark
+- ✅ 1️⃣ 게시글에 대한 CRUD
+  - 1️⃣ 내가 작성한, 댓글 단, 좋아요한 등 각각의 다양한 기준으로 게시글을 조회하기
+  - 1️⃣ comment 서버에서 comment 개수 가져오기
+  - 1️⃣ alimi 서버에서 게시글에 대한 알림 구독 정보 가져오기
+- ✅  1️⃣ 게시글에 대한 Like / Unlike
+- ✅  1️⃣ 게시글에 대한 Bookmark / Unbookomark
 - 1️⃣ 게시글에 대한 차단 기능
 - 1️⃣ 다양한 엔티티에 대한 신고 기능
 - 학사 일정에 대한 Read - 파이썬으로 할 지 고민

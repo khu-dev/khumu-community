@@ -20,9 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    @Value("${jwt.secret}")
-    private final String secret = null;
     private final JwtTokenProvider tokenProvider;
     final List<String> SKIPPER_URIS = Arrays.asList("/");
 

@@ -20,13 +20,13 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public class SlackNotifier implements Notifier {
-    @Value("${notification.slack.enabled}")
+    @Value("${khumu.notification.slack.enabled}")
     private boolean slackEnabled;
-    @Value("${notification.slack.webhook.url}")
+    @Value("${khumu.notification.slack.webhook.url}")
     private String webhookUrl;
-    @Value("${notification.slack.channel}")
+    @Value("${khumu.notification.slack.channel}")
     private String channel;
-    @Value("${notification.slack.icon.emoji}") private String iconEmoji;
+    @Value("${khumu.notification.slack.icon.emoji}") private String iconEmoji;
 
     @Autowired
     Environment env;

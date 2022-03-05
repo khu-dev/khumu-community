@@ -17,7 +17,7 @@ import java.util.Map;
 public class SnsPublisher implements MessagePublisher {
 	private final NotificationMessagingTemplate notificationMessagingTemplate;
 	private final ObjectMapper jacksonObjectMapper;
-	@Value("${messaging.sns.topic}")
+	@Value("${khumu.messaging.sns.topic}")
 	private String snsTopic;
 
 //	public void setSnsTopic(String topic) {

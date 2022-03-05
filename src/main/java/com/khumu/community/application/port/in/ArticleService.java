@@ -27,6 +27,7 @@ import java.util.List;
 @Slf4j
 public class ArticleService {
     private final ArticleMapper articleMapper;
+    private final ArticleAdditionalDataInjector articleAdditionalDataInjector;
     private final ArticleRepository articleRepository;
     private final FollowBoardRepository followBoardRepository;
 
@@ -48,8 +49,8 @@ public class ArticleService {
 
         // TODO: 게시글 생성 이벤트를 SNS에 발행하기!
         messagePublisher.publish("article", "create", articleMapper.toEventDto(article));
-        
-        return articleMapper.toDto(article);
+
+        return articleAdditionalDataInjector.inject(articleMapper.toDto(article), requestUser);
     }
 
     @Transactional
@@ -62,7 +63,7 @@ public class ArticleService {
 
 //        Page<Article> a = articleRepository.findAll(Pageable.unpaged());
 
-        return articles.map(articleMapper::toDto);
+        return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
     }
 
     @Transactional
@@ -88,7 +89,7 @@ public class ArticleService {
             article.setKind(input.getKind());
         }
 
-        return articleMapper.toDto(article);
+        return articleAdditionalDataInjector.inject(articleMapper.toDto(article), requestUser);
     }
 
     @Transactional

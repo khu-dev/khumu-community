@@ -22,13 +22,13 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
+    @Value("${khumu.jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.access.expiryDuration}")
+    @Value("${khumu.jwt.access.expiryDuration}")
     private Long accessExpiryDuration;
 
-    @Value("${jwt.refresh.expiryDuration}")
+    @Value("${khumu.jwt.refresh.expiryDuration}")
     private Long refreshExpiryDuration;
 
     private static final String HEADER = "Authorization";
