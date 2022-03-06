@@ -34,12 +34,12 @@ public class LikeArticleService {
     // 좋아요 했으면 true
     // 좋아요를 취소했으면 false
     public Boolean toggle(User requestUser, Integer articleId) {
-        List<LikeArticle> likes = likeArticleRepository.findAllByUserAndArticle(requestUser.getUsername(), articleId);
+        List<LikeArticle> likes = likeArticleRepository.findAllByUserAndArticle(requestUser.getUsername(), Article.builder().id(articleId).build());
 
         if (likes.isEmpty()) {
             likeArticleRepository.save(LikeArticle.builder()
                     .user(requestUser.getUsername())
-                    .article(articleId)
+                    .article(Article.builder().id(articleId).build())
                     .build());
 
             Article article = articleRepository.findById(articleId).get();
@@ -63,7 +63,7 @@ public class LikeArticleService {
     private Boolean shouldBeHot(Article article) {
         if (article.getIsHot()) return false;
 
-        Long likeCount = likeArticleRepository.countByArticle(article.getId());
+        Long likeCount = likeArticleRepository.countByArticle(Article.builder().id(article.getId()).build());
         if (likeCount < minLikeCountForHotArticle) {
             return false;
         }

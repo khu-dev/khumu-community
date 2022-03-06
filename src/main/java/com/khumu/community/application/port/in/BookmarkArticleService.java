@@ -1,5 +1,6 @@
 package com.khumu.community.application.port.in;
 
+import com.khumu.community.application.entity.Article;
 import com.khumu.community.application.entity.BookmarkArticle;
 import com.khumu.community.application.entity.LikeArticle;
 import com.khumu.community.application.entity.User;
@@ -22,12 +23,12 @@ public class BookmarkArticleService {
     // 좋아요 했으면 true
     // 좋아요를 취소했으면 false
     public Boolean toggle(User requestUser, Integer articleId) {
-        List<BookmarkArticle> bookmarks = bookmarkArticleRepository.findAllByUserAndArticle(requestUser.getUsername(), articleId);
+        List<BookmarkArticle> bookmarks = bookmarkArticleRepository.findAllByUserAndArticle(requestUser.getUsername(), Article.builder().id(articleId).build());
 
         if (bookmarks.isEmpty()) {
             bookmarkArticleRepository.save(BookmarkArticle.builder()
                     .user(requestUser.getUsername())
-                    .article(articleId)
+                    .article(Article.builder().id(articleId).build())
                     .build());
 
             return true;

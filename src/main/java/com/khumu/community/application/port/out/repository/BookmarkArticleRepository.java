@@ -1,5 +1,6 @@
 package com.khumu.community.application.port.out.repository;
 
+import com.khumu.community.application.entity.Article;
 import com.khumu.community.application.entity.BookmarkArticle;
 import com.khumu.community.application.entity.LikeArticle;
 import org.springframework.data.domain.Page;
@@ -9,10 +10,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface BookmarkArticleRepository extends JpaRepository<BookmarkArticle, Integer> {
-    Page<BookmarkArticle> findAllByUser(String user, Pageable pageable);
+    Page<BookmarkArticle> findAllByUserAndArticle_Author_UsernameNotIn(String user, List<String> excludedAuthorUsernames, Pageable pageable);
 
-    List<BookmarkArticle> findAllByUserAndArticle(String user, Integer article);
-    Long countByUserAndArticle(String user, Integer article);
+    List<BookmarkArticle> findAllByUserAndArticle(String user, Article article);
+    Long countByUserAndArticle(String user, Article article);
 
-    Long countByArticle(Integer article);
+    Long countByArticle(Article article);
 }

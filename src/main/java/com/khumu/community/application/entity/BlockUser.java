@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class UserBlock {
+public class BlockUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

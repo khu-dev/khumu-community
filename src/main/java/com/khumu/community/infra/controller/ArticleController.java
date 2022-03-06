@@ -29,33 +29,59 @@ public class ArticleController {
     @GetMapping(value = "/api/community/v1/articles")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.OK)
-    public DefaultResponse<List<ArticleDto>> list(@AuthenticationPrincipal User user, @PageableDefault(page=0, size=20, sort="createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ArticleDto> articles = articleService.listArticlesForFeed(user, pageable);
+    public DefaultResponse<List<ArticleDto>> list(
+            @AuthenticationPrincipal User user,
+            @RequestHeader(name="Authorization") String authorizationString,
+            @RequestParam String board,
+            @PageableDefault(page=0, size=20, sort="createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ArticleDto> articles = null;
+        switch (board) {
+            case "following":
+            case "feed":
+                articles = articleService.listArticlesForFeed(user, pageable);
+                break;
+            case "my":
+                articles = articleService.listArticlesIWrote(user, pageable);
+                break;
+            case "liked":
+                articles = articleService.listArticlesILiked(user, pageable);
+                break;
+            case "bookmarked":
+                articles = articleService.listArticlesIBookmarked(user, pageable);
+                break;
+            case "commented":
+                return DefaultResponse.<List<ArticleDto>>builder()
+                        .data(articleService.listArticlesICommented(user, authorizationString, pageable))
+                        .build();
+            default:
+                articles = articleService.listArticlesByBoard(user, board, pageable);
+        }
+
         return DefaultResponse.<List<ArticleDto>>builder()
                 .data(articles.getContent())
-                .links(DefaultResponse.Links.builder().build())
                 .build();
     }
 
     @PostMapping(value = "/api/community/v1/articles")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.CREATED)
-    public DefaultResponse<ArticleDto> list(@AuthenticationPrincipal User user, @RequestBody CreateArticleRequest body) {
+    public DefaultResponse<ArticleDto> create(@AuthenticationPrincipal User user, @RequestBody CreateArticleRequest body) {
         ArticleDto article = articleService.write(user, body);
         return DefaultResponse.<ArticleDto>builder()
                 .data(article)
-                .links(DefaultResponse.Links.builder().build())
                 .build();
     }
 
     @PatchMapping(value = "/api/community/v1/articles/{id}")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.OK)
-    public DefaultResponse<ArticleDto> list(@AuthenticationPrincipal User user, @PathVariable Integer id, @RequestBody UpdateArticleRequest body) {
+    public DefaultResponse<ArticleDto> update(
+            @AuthenticationPrincipal User user,
+            @PathVariable Integer id,
+            @RequestBody UpdateArticleRequest body) {
         ArticleDto article = articleService.update(user, id, body);
         return DefaultResponse.<ArticleDto>builder()
                 .data(article)
-                .links(DefaultResponse.Links.builder().build())
                 .build();
     }
 
@@ -66,7 +92,6 @@ public class ArticleController {
         articleService.delete(user, id);
         return DefaultResponse.<Void>builder()
                 .data(null)
-                .links(DefaultResponse.Links.builder().build())
                 .build();
     }
 

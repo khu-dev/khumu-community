@@ -3,14 +3,10 @@ package com.khumu.community.application.port.in;
 import com.khumu.community.application.dto.ArticleDto;
 import com.khumu.community.application.dto.input.CreateArticleRequest;
 import com.khumu.community.application.dto.input.UpdateArticleRequest;
-import com.khumu.community.application.entity.Article;
-import com.khumu.community.application.entity.Board;
-import com.khumu.community.application.entity.FollowBoard;
-import com.khumu.community.application.entity.User;
+import com.khumu.community.application.entity.*;
 import com.khumu.community.application.exception.ForbiddenException;
 import com.khumu.community.application.port.out.messaging.MessagePublisher;
-import com.khumu.community.application.port.out.repository.ArticleRepository;
-import com.khumu.community.application.port.out.repository.FollowBoardRepository;
+import com.khumu.community.application.port.out.repository.*;
 import com.khumu.community.common.mapper.ArticleMapper;
 import com.khumu.community.infra.messaging.SnsPublisher;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +29,10 @@ public class ArticleService {
     private final ArticleAdditionalDataInjector articleAdditionalDataInjector;
     private final ArticleRepository articleRepository;
     private final FollowBoardRepository followBoardRepository;
+    private final BlockUserRepository blockUserRepository;
+    private final LikeArticleRepository likeArticleRepository;
+    private final BookmarkArticleRepository bookmarkArticleRepository;
+    private final CommentRepository commentRepository;
 
     private final MessagePublisher messagePublisher;
 
@@ -53,19 +56,105 @@ public class ArticleService {
         return articleAdditionalDataInjector.inject(articleMapper.toDto(article), requestUser);
     }
 
+    // 피드에 표시될 게시글 조회
     @Transactional
     public Page<ArticleDto> listArticlesForFeed(User requestUser, Pageable pageable) {
-        List<Board> boards = followBoardRepository.findAllByUser(requestUser, Pageable.unpaged()).map(FollowBoard::getBoard).toList();
-        Page<Article> articles = articleRepository.findAllByBoardIn(
-               boards,
+        List<Board> followingBoards = followBoardRepository.findAllByUser(requestUser.getUsername(), Pageable.unpaged()).map(FollowBoard::getBoard).toList();
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
+
+        // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
+        // 따라서 non-null인 dummy를 한 칸 넣어준다.
+        if (blockedUsernames.isEmpty()) blockedUsernames.add("");
+
+        Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotIn(
+                followingBoards,
+                blockedUsernames,
                 pageable
         );
-
-//        Page<Article> a = articleRepository.findAll(Pageable.unpaged());
 
         return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
     }
 
+    // 내가 작성한 게시글 조회
+    @Transactional
+    public Page<ArticleDto> listArticlesIWrote(User requestUser, Pageable pageable) {
+        Page<Article> articles = articleRepository.findAllByAuthor(requestUser, pageable);
+
+        return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
+    }
+
+    // 내가 좋아요한 게시글 조회
+    @Transactional
+    public Page<ArticleDto> listArticlesILiked(User requestUser, Pageable pageable) {
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
+
+        // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
+        // 따라서 non-null인 dummy를 한 칸 넣어준다.
+        if (blockedUsernames.isEmpty()) blockedUsernames.add("");
+
+        Page<LikeArticle> likes = likeArticleRepository.findAllByUserAndArticle_Author_UsernameNotIn(requestUser.getUsername(), blockedUsernames, pageable);
+        Page<Article> articles = likes.map(LikeArticle::getArticle);
+
+        return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
+    }
+
+    // 내가 북마크한 게시글 조회
+    @Transactional
+    public Page<ArticleDto> listArticlesIBookmarked(User requestUser, Pageable pageable) {
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
+
+        // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
+        // 따라서 non-null인 dummy를 한 칸 넣어준다.
+        if (blockedUsernames.isEmpty()) blockedUsernames.add("");
+
+        Page<BookmarkArticle> bookmarks = bookmarkArticleRepository.findAllByUserAndArticle_Author_UsernameNotIn(requestUser.getUsername(), blockedUsernames, pageable);
+        Page<Article> articles = bookmarks.map(BookmarkArticle::getArticle);
+
+        return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
+    }
+    
+    // 내가 댓글 단 게시글들 조회
+    // Page 정보를 올바르게 전달하기는 힘들어서 List로 전달
+    @Transactional
+    public List<ArticleDto> listArticlesICommented(User requestUser, String authorizationString, Pageable pageable) {
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
+
+        // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
+        // 따라서 non-null인 dummy를 한 칸 넣어준다.
+        if (blockedUsernames.isEmpty()) blockedUsernames.add("");
+
+        List<Integer> articleIds = commentRepository.findAllArticlesUserCommented(authorizationString, pageable);
+        List<Article> articles = new ArrayList<>(articleRepository.findAllByIdInAndAuthor_UsernameNotIn(articleIds, blockedUsernames, Pageable.unpaged()).getContent());
+        // comment 서비스에서 조회해 온 인덱스 대로 정렬한다.
+        // 인덱스에 따라 오름차순 정렬
+        articles.sort((Article a, Article b) -> {
+            if (articleIds.indexOf(a.getId()) < articleIds.indexOf(b.getId())) return -1;
+
+            return 1;
+        });
+
+        return articleAdditionalDataInjector.inject(articles.stream().map(articleMapper::toDto).collect(Collectors.toList()), requestUser);
+    }
+    
+    // 특정 게시판의 게시글들 조회
+    @Transactional
+    public Page<ArticleDto> listArticlesByBoard(User requestUser, String board, Pageable pageable) {
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
+
+        // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
+        // 따라서 non-null인 dummy를 한 칸 넣어준다.
+        if (blockedUsernames.isEmpty()) blockedUsernames.add("");
+
+        Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotIn(List.of(Board.builder().name(board).build()), blockedUsernames, pageable);
+
+        return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
+    }
+    
     @Transactional
     // TODO: 기존에는 Patch(부분 수정) 방식이었는데 이거 어떻게 대응해줄 것인가?
     // 일단은 null일 수 없는 값들이기때문에 null이면 수정 안하기로.

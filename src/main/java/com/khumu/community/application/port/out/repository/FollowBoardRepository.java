@@ -8,5 +8,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FollowBoardRepository extends JpaRepository<FollowBoard, Long> {
-    Page<FollowBoard> findAllByUser(User user, Pageable pageable);
+    Page<FollowBoard> findAllByUser(String username, Pageable pageable);
 }

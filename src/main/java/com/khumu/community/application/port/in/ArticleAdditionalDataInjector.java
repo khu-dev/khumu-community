@@ -1,6 +1,7 @@
 package com.khumu.community.application.port.in;
 
 import com.khumu.community.application.dto.ArticleDto;
+import com.khumu.community.application.entity.Article;
 import com.khumu.community.application.entity.BookmarkArticle;
 import com.khumu.community.application.entity.LikeArticle;
 import com.khumu.community.application.entity.User;
@@ -24,20 +25,28 @@ public class ArticleAdditionalDataInjector {
     public ArticleDto inject(ArticleDto articleDto, User requestUser) {
         articleDto.setCommentCount(commentRepository.countByArticle(articleDto.getId()));
         if (requestUser != null){
-            articleDto.setLiked(likeArticleRepository.countByUserAndArticle(requestUser.getUsername(), articleDto.getId()) != 0);
+            articleDto.setLiked(likeArticleRepository.countByUserAndArticle(requestUser.getUsername(), Article.builder().id(articleDto.getId()).build()) != 0);
         }
-        articleDto.setLikeArticleCount(likeArticleRepository.countByArticle(articleDto.getId()));
+        articleDto.setLikeArticleCount(likeArticleRepository.countByArticle(Article.builder().id(articleDto.getId()).build()));
 
         if (requestUser != null) {
-            articleDto.setBookmarked(bookmarkArticleRepository.countByUserAndArticle(requestUser.getUsername(), articleDto.getId()) != 0);
+            articleDto.setBookmarked(bookmarkArticleRepository.countByUserAndArticle(requestUser.getUsername(), Article.builder().id(articleDto.getId()).build()) != 0);
         }
 
-        articleDto.setBookmarkArticleCount(bookmarkArticleRepository.countByArticle(articleDto.getId()));
+        articleDto.setBookmarkArticleCount(bookmarkArticleRepository.countByArticle(Article.builder().id(articleDto.getId()).build()));
 
         return articleDto;
     }
 
     public Page<ArticleDto> inject(Page<ArticleDto> articleDtos, User requestUser) {
+        for (ArticleDto articleDto :
+                articleDtos) {
+            inject(articleDto, requestUser);
+        }
+
+        return articleDtos;
+    }
+    public List<ArticleDto> inject(List<ArticleDto> articleDtos, User requestUser) {
         for (ArticleDto articleDto :
                 articleDtos) {
             inject(articleDto, requestUser);
