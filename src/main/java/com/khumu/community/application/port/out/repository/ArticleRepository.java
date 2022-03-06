@@ -17,4 +17,9 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     Page<Article> findAllByIdIn(List<Long> ids, Pageable pageable);
 
     Page<Article> findAllByIsHot(Boolean isHot, Pageable pageable);
+
+    // 내가 팔로우 중인 Board의 게시글이며
+    // 내가 차단하지 않은 작성자의 게시글이며
+    // 내가
+//    Page<Article> findAllForFeed()
 }
