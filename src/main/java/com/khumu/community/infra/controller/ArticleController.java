@@ -49,6 +49,9 @@ public class ArticleController {
             case "bookmarked":
                 articles = articleService.listArticlesIBookmarked(user, pageable);
                 break;
+            case "hot":
+                articles = articleService.listHotArticles(user, pageable);
+                break;
             case "commented":
                 return DefaultResponse.<List<ArticleDto>>builder()
                         .data(articleService.listArticlesICommented(user, authorizationString, pageable))

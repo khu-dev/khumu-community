@@ -139,7 +139,23 @@ public class ArticleService {
 
         return articleAdditionalDataInjector.inject(articles.stream().map(articleMapper::toDto).collect(Collectors.toList()), requestUser);
     }
-    
+
+    // 내가 댓글 단 게시글들 조회
+    // Page 정보를 올바르게 전달하기는 힘들어서 List로 전달
+    @Transactional
+    public Page<ArticleDto> listHotArticles(User requestUser, Pageable pageable) {
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
+
+        // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
+        // 따라서 non-null인 dummy를 한 칸 넣어준다.
+        if (blockedUsernames.isEmpty()) blockedUsernames.add("");
+
+        Page<Article> articles = articleRepository.findAllByIsHotAndAuthor_UsernameNotIn(true, blockedUsernames, pageable);
+
+        return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
+    }
+
     // 특정 게시판의 게시글들 조회
     @Transactional
     public Page<ArticleDto> listArticlesByBoard(User requestUser, String board, Pageable pageable) {
