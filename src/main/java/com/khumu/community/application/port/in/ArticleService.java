@@ -2,16 +2,14 @@ package com.khumu.community.application.port.in;
 
 import com.khumu.community.application.dto.ArticleDto;
 import com.khumu.community.application.dto.DetailedArticleDto;
-import com.khumu.community.application.dto.input.CreateArticleRequest;
+import com.khumu.community.application.dto.input.CreateArticleInput;
 import com.khumu.community.application.dto.input.IsAuthorInput;
-import com.khumu.community.application.dto.input.UpdateArticleRequest;
-import com.khumu.community.application.dto.output.IsAuthorOutput;
+import com.khumu.community.application.dto.input.UpdateArticleInput;
 import com.khumu.community.application.entity.*;
 import com.khumu.community.application.exception.ForbiddenException;
 import com.khumu.community.application.port.out.messaging.MessagePublisher;
 import com.khumu.community.application.port.out.repository.*;
 import com.khumu.community.common.mapper.ArticleMapper;
-import com.khumu.community.infra.messaging.SnsPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +37,7 @@ public class ArticleService {
     private final MessagePublisher messagePublisher;
 
     @Transactional
-    public ArticleDto write(User requestUser, CreateArticleRequest input) {
+    public ArticleDto write(User requestUser, CreateArticleInput input) {
         Article tmp = Article.builder()
                 .author(requestUser)
                 .board(Board.builder().name(input.getBoard()).build())
@@ -63,7 +60,7 @@ public class ArticleService {
     @Transactional
     public Page<ArticleDto> listArticlesForFeed(User requestUser, Pageable pageable) {
         List<Board> followingBoards = followBoardRepository.findAllByUser(requestUser.getUsername(), Pageable.unpaged()).map(FollowBoard::getBoard).toList();
-        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername(), Pageable.unpaged()).getContent();
         List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
 
         // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
@@ -90,7 +87,7 @@ public class ArticleService {
     // 내가 좋아요한 게시글 조회
     @Transactional
     public Page<ArticleDto> listArticlesILiked(User requestUser, Pageable pageable) {
-        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername(), Pageable.unpaged()).getContent();
         List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
 
         // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
@@ -106,7 +103,7 @@ public class ArticleService {
     // 내가 북마크한 게시글 조회
     @Transactional
     public Page<ArticleDto> listArticlesIBookmarked(User requestUser, Pageable pageable) {
-        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername(), Pageable.unpaged()).getContent();
         List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
 
         // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
@@ -123,7 +120,7 @@ public class ArticleService {
     // Page 정보를 올바르게 전달하기는 힘들어서 List로 전달
     @Transactional
     public List<ArticleDto> listArticlesICommented(User requestUser, String authorizationString, Pageable pageable) {
-        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername(), Pageable.unpaged()).getContent();
         List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
 
         // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
@@ -147,7 +144,7 @@ public class ArticleService {
     // Page 정보를 올바르게 전달하기는 힘들어서 List로 전달
     @Transactional
     public Page<ArticleDto> listHotArticles(User requestUser, Pageable pageable) {
-        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername(), Pageable.unpaged()).getContent();
         List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
 
         // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
@@ -162,7 +159,7 @@ public class ArticleService {
     // 특정 게시판의 게시글들 조회
     @Transactional
     public Page<ArticleDto> listArticlesByBoard(User requestUser, String board, Pageable pageable) {
-        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername());
+        List<BlockUser> blocks = blockUserRepository.findAllByBlocker(requestUser.getUsername(), Pageable.unpaged()).getContent();
         List<String> blockedUsernames = blocks.stream().map(BlockUser::getBlockee).collect(Collectors.toList());
 
         // list가 empty이면 JPQL에서 in query가 제대로 동작되지 못함.
@@ -185,7 +182,7 @@ public class ArticleService {
     @Transactional
     // TODO: 기존에는 Patch(부분 수정) 방식이었는데 이거 어떻게 대응해줄 것인가?
     // 일단은 null일 수 없는 값들이기때문에 null이면 수정 안하기로.
-    public ArticleDto update(User requestUser, Integer id, UpdateArticleRequest input) {
+    public ArticleDto update(User requestUser, Integer id, UpdateArticleInput input) {
 
         Article article = articleRepository.findById(id).get();
         if (input.getBoard() != null) {

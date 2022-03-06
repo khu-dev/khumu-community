@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class CreateArticleRequest {
+public class CreateArticleInput {
     String title;
     String board;
     String content;

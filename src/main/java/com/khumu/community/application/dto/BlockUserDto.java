@@ -1,30 +1,30 @@
-package com.khumu.community.application.entity;
+package com.khumu.community.application.dto;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class BlockUser extends BaseEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BlockUserDto {
     Long id;
     // 차단을 수행한 사람
     String blocker;
     // 차단 당한 사람
-    String blockee;
+    SimpleUserDto blockee;
     // 차단 당한 사람의 정보를 익명으로 가려줄 것인지
     Boolean isBlockeeAnonymous;
     // 차단한 이유
     String reason;
+    // 언제 차단한 것인지
+    LocalDateTime createdAt;
 }

@@ -2,9 +2,9 @@ package com.khumu.community.infra.controller;
 
 import com.khumu.community.application.dto.ArticleDto;
 import com.khumu.community.application.dto.DetailedArticleDto;
-import com.khumu.community.application.dto.input.CreateArticleRequest;
+import com.khumu.community.application.dto.input.CreateArticleInput;
 import com.khumu.community.application.dto.input.IsAuthorInput;
-import com.khumu.community.application.dto.input.UpdateArticleRequest;
+import com.khumu.community.application.dto.input.UpdateArticleInput;
 import com.khumu.community.application.dto.output.IsAuthorOutput;
 import com.khumu.community.application.entity.User;
 import com.khumu.community.application.port.in.ArticleService;
@@ -32,7 +32,7 @@ public class ArticleController {
     @PostMapping(value = "/api/community/v1/articles")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.CREATED)
-    public DefaultResponse<ArticleDto> create(@AuthenticationPrincipal User user, @RequestBody CreateArticleRequest body) {
+    public DefaultResponse<ArticleDto> create(@AuthenticationPrincipal User user, @RequestBody CreateArticleInput body) {
         ArticleDto article = articleService.write(user, body);
         return DefaultResponse.<ArticleDto>builder()
                 .data(article)
@@ -95,7 +95,7 @@ public class ArticleController {
     public DefaultResponse<ArticleDto> update(
             @AuthenticationPrincipal User user,
             @PathVariable Integer id,
-            @RequestBody UpdateArticleRequest body) {
+            @RequestBody UpdateArticleInput body) {
         ArticleDto article = articleService.update(user, id, body);
         return DefaultResponse.<ArticleDto>builder()
                 .data(article)
