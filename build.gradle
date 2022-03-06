@@ -48,3 +48,10 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// gradle로 빌드 시 plain jar를 생성하지 않기 위함
+// spring boot 2.5부터 변경됐음.
+// https://earth-95.tistory.com/132
+jar {
+	enabled = false
+}
