@@ -39,7 +39,7 @@ public class DetailedArticleDto {
     Boolean isHot;
 
     // TODO: createdAt을 human readable한 text로
-    LocalDateTime createdAt;
+    String createdAt;
 
     @Builder.Default
     Boolean isSubscribed = false;

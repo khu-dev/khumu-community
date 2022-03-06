@@ -37,7 +37,6 @@ public class ArticleDto {
 
     String kind;
     Boolean isHot;
-
-    // TODO: createdAt을 human readable한 text로
-    LocalDateTime createdAt;
+    
+    String createdAt;
 }
