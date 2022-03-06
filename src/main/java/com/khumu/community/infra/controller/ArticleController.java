@@ -1,6 +1,7 @@
 package com.khumu.community.infra.controller;
 
 import com.khumu.community.application.dto.ArticleDto;
+import com.khumu.community.application.dto.DetailedArticleDto;
 import com.khumu.community.application.dto.input.CreateArticleRequest;
 import com.khumu.community.application.dto.input.IsAuthorInput;
 import com.khumu.community.application.dto.input.UpdateArticleRequest;
@@ -27,7 +28,17 @@ public class ArticleController {
     final private ArticleService articleService;
     final private LikeArticleService likeArticleService;
     final private BookmarkArticleService bookmarkArticleService;
-    
+
+    @PostMapping(value = "/api/community/v1/articles")
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public DefaultResponse<ArticleDto> create(@AuthenticationPrincipal User user, @RequestBody CreateArticleRequest body) {
+        ArticleDto article = articleService.write(user, body);
+        return DefaultResponse.<ArticleDto>builder()
+                .data(article)
+                .build();
+    }
+
     @GetMapping(value = "/api/community/v1/articles")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.OK)
@@ -67,12 +78,13 @@ public class ArticleController {
                 .build();
     }
 
-    @PostMapping(value = "/api/community/v1/articles")
+    @GetMapping(value = "/api/community/v1/articles/{id}")
     @ResponseBody
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public DefaultResponse<ArticleDto> create(@AuthenticationPrincipal User user, @RequestBody CreateArticleRequest body) {
-        ArticleDto article = articleService.write(user, body);
-        return DefaultResponse.<ArticleDto>builder()
+    @ResponseStatus(code = HttpStatus.OK)
+    public DefaultResponse<DetailedArticleDto> get(@AuthenticationPrincipal User user, @PathVariable Integer id) {
+        DetailedArticleDto article = articleService.getArticle(user, id);
+
+        return DefaultResponse.<DetailedArticleDto>builder()
                 .data(article)
                 .build();
     }

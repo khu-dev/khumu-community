@@ -1,10 +1,12 @@
 package com.khumu.community.application.port.in;
 
 import com.khumu.community.application.dto.ArticleDto;
+import com.khumu.community.application.dto.DetailedArticleDto;
 import com.khumu.community.application.entity.Article;
 import com.khumu.community.application.entity.BookmarkArticle;
 import com.khumu.community.application.entity.LikeArticle;
 import com.khumu.community.application.entity.User;
+import com.khumu.community.application.port.out.repository.AlimiRepository;
 import com.khumu.community.application.port.out.repository.BookmarkArticleRepository;
 import com.khumu.community.application.port.out.repository.CommentRepository;
 import com.khumu.community.application.port.out.repository.LikeArticleRepository;
@@ -21,6 +23,7 @@ public class ArticleAdditionalDataInjector {
     private final LikeArticleRepository likeArticleRepository;
     private final BookmarkArticleRepository bookmarkArticleRepository;
     private final CommentRepository commentRepository;
+    private final AlimiRepository alimiRepository;
 
     public ArticleDto inject(ArticleDto articleDto, User requestUser) {
         articleDto.setCommentCount(commentRepository.countByArticle(articleDto.getId()));
@@ -53,5 +56,18 @@ public class ArticleAdditionalDataInjector {
         }
 
         return articleDtos;
+    }
+
+    public DetailedArticleDto inject(DetailedArticleDto src, User requestUser) {
+
+        if (requestUser == null || requestUser.getUsername() == null) {
+            src.setIsSubscribed(false);
+
+            return src;
+        }
+
+        src.setIsSubscribed(alimiRepository.isSubscribed(requestUser.getUsername(), "article", String.valueOf(src.getId())));
+
+        return src;
     }
 }

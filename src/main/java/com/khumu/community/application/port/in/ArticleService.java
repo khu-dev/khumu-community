@@ -1,6 +1,7 @@
 package com.khumu.community.application.port.in;
 
 import com.khumu.community.application.dto.ArticleDto;
+import com.khumu.community.application.dto.DetailedArticleDto;
 import com.khumu.community.application.dto.input.CreateArticleRequest;
 import com.khumu.community.application.dto.input.IsAuthorInput;
 import com.khumu.community.application.dto.input.UpdateArticleRequest;
@@ -171,6 +172,14 @@ public class ArticleService {
         Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotIn(List.of(Board.builder().name(board).build()), blockedUsernames, pageable);
 
         return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
+    }
+
+    // 특정 게시글의 상세 조회
+    @Transactional
+    public DetailedArticleDto getArticle(User requestUser, Integer id) {
+        Article article = articleRepository.findById(id).get();
+
+        return articleAdditionalDataInjector.inject(articleMapper.toDetailedDto(article), requestUser);
     }
     
     @Transactional
