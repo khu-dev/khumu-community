@@ -2,7 +2,9 @@ package com.khumu.community.infra.controller;
 
 import com.khumu.community.application.dto.ArticleDto;
 import com.khumu.community.application.dto.input.CreateArticleRequest;
+import com.khumu.community.application.dto.input.IsAuthorInput;
 import com.khumu.community.application.dto.input.UpdateArticleRequest;
+import com.khumu.community.application.dto.output.IsAuthorOutput;
 import com.khumu.community.application.entity.User;
 import com.khumu.community.application.port.in.ArticleService;
 import com.khumu.community.application.port.in.BookmarkArticleService;
@@ -120,5 +122,18 @@ public class ArticleController {
 
         // 근데 204면 No content라 body가 아예 안가긴하네.
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DefaultResponse.builder().message("게시글에 대한 북마크를 취소했습니다.").build());
+    }
+
+    @PostMapping(value = "/api/community/v1/articles/{id}/is-author")
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.OK)
+    public DefaultResponse<IsAuthorOutput> isAuthor(@AuthenticationPrincipal User user, @PathVariable Integer id, @RequestBody IsAuthorInput body) {
+        // 근데 204면 No content라 body가 아예 안가긴하네.
+
+        return DefaultResponse.<IsAuthorOutput>builder()
+                .data(IsAuthorOutput.builder()
+                                .isAuthor(articleService.isAuthor(user, id, body))
+                    .build())
+                .build();
     }
 }

@@ -2,7 +2,9 @@ package com.khumu.community.application.port.in;
 
 import com.khumu.community.application.dto.ArticleDto;
 import com.khumu.community.application.dto.input.CreateArticleRequest;
+import com.khumu.community.application.dto.input.IsAuthorInput;
 import com.khumu.community.application.dto.input.UpdateArticleRequest;
+import com.khumu.community.application.dto.output.IsAuthorOutput;
 import com.khumu.community.application.entity.*;
 import com.khumu.community.application.exception.ForbiddenException;
 import com.khumu.community.application.port.out.messaging.MessagePublisher;
@@ -209,4 +211,20 @@ public class ArticleService {
         }
         articleRepository.delete(article);
     }
+
+    // TODO: 지금은 comment 서비스가 author을 직접 찍어서 보내지만
+    // 이렇게 되면 보안상 취약하다.
+    public boolean isAuthor(User requestUser, Integer articleId, IsAuthorInput input) {
+        Article article = articleRepository.findById(articleId).orElse(null);
+        if (article == null) {
+            log.error("존재하지 않는 게시글 id입니다. id=" + article);
+            return false;
+        }
+        if (!input.getAuthor().equals(article.getAuthor().getUsername())) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
