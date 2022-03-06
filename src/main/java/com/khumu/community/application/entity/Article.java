@@ -19,9 +19,14 @@ public class Article extends BaseEntity {
     Integer id;
     String title;
     // 일반 String은 VARCHAR(255)로 정의왼다.
-    @Column(columnDefinition = "TEXT")
+    // LONGTEXT는 VARCHAR가 아닌 Long text로 저장됨.
+    @Column(columnDefinition = "LONGTEXT")
     String content;
+    
+    // TODO: new_images -> images colum으로 migrate하기
+    // JPA는 MySQL의 json 컬럼으로는 못 쓰고 Text column을 json 처럼 파싱해서 쓸 수 밖에 없나?
     @Convert(converter = JpaConverterJson.class)
+    @Column(columnDefinition = "LONGTEXT")
     @Builder.Default
     List<String> newImages = new ArrayList<>();
     

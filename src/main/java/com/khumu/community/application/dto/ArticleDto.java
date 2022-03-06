@@ -15,6 +15,7 @@ public class ArticleDto {
     Integer id;
     String boardName;
     String boardDisplayName;
+    // TODO: 익명의 경우 작성자를 숨기기
     SimpleUserDto author;
     String title;
     String content;
@@ -36,5 +37,7 @@ public class ArticleDto {
 
     String kind;
     Boolean isHot;
+
+    // TODO: createdAt을 human readable한 text로
     LocalDateTime createdAt;
 }

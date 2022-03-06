@@ -53,6 +53,8 @@ public class CommentClient implements CommentRepository {
             return 0L;
         }
 
+        log.info("CommentClient.countByArticle 의 응답: " + resp.getBody());
+
         return resp.getBody().getCommentCount();
 
     }
@@ -75,12 +77,15 @@ public class CommentClient implements CommentRepository {
             return new ArrayList<>();
         }
 
+        log.info("CommentClient.findAllArticlesUserCommented 의 응답: " + resp.getBody());
+
         return resp.getBody().getData();
     }
 
     @AllArgsConstructor
     @Getter
     @Setter
+    @ToString
     private static class CountByArticleRequest{
         Integer article;
     }
@@ -89,6 +94,7 @@ public class CommentClient implements CommentRepository {
     @NoArgsConstructor
     @Getter
     @Setter
+    @ToString
     private static class CountByArticleResponse{
         Long commentCount = 0L;
     }
@@ -96,6 +102,7 @@ public class CommentClient implements CommentRepository {
     @AllArgsConstructor
     @Getter
     @Setter
+    @ToString
     private static class FindAllArticlesUserCommentedRequest{
         Integer page;
         Integer size;
@@ -105,6 +112,7 @@ public class CommentClient implements CommentRepository {
     @NoArgsConstructor
     @Getter
     @Setter
+    @ToString
     private static class FindAllArticlesUserCommentedResponse{
         List<Integer> data = new ArrayList<>();
         String message;
