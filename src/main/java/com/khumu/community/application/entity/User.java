@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name="user_khumuuser")
 @AllArgsConstructor
@@ -13,15 +15,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class User {
+public class User extends BaseEntity{
     @Id
     String username;
     String password;
     Boolean isActive;
     @CreatedDate
-    LocalDateTime dateJoined;
-    @CreatedDate
-    LocalDateTime createdAt;
+    @Builder.Default
+    LocalDateTime dateJoined = LocalDateTime.now();
     String kind;
     String studentNumber;
 
@@ -33,6 +34,13 @@ public class User {
     LocalDateTime info21AuthenticatedAt;
     String status;
     String nickname;
+
+    @ManyToMany
+    @JoinTable(name = "user_khumuuser_groups",
+            joinColumns = @JoinColumn(name = "khumuuser_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
+            @Builder.Default
+    List<Group> groups = new ArrayList<>();
 
     public static void throwOnUnauthenticated(User user) {
         if (user == null || user.getUsername() == null) {
