@@ -43,6 +43,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-aws-messaging
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-messaging', version: '2.2.6.RELEASE'
 
+	implementation 'com.vladmihalcea:hibernate-types-5:1.2.0'
 }
 
 tasks.named('test') {

@@ -44,7 +44,7 @@ public class ArticleService {
                 .title(input.getTitle())
                 .content(input.getContent())
                 .isHot(false)
-                .newImages(input.getImages())
+                .images(input.getImages())
                 .kind(input.getKind())
                 .build();
 
@@ -196,7 +196,7 @@ public class ArticleService {
             article.setContent(input.getContent());
         }
         if (input.getImages() != null) {
-            article.setNewImages(input.getImages());
+            article.setImages(input.getImages());
         }
         if (input.getKind() != null) {
             article.setKind(input.getKind());

@@ -23,17 +23,11 @@ public interface ArticleMapper {
     @Mapping(target="boardName", source="board.name")
     @Mapping(target="boardDisplayName", source="board.displayName")
     @Mapping(target="createdAt", qualifiedByName="localDateTimeToHumanFriendlyString")
-    // TODO
-    // 나중엔 newImages -> images로 컬럼 명 자체를 바꿔야할 듯
-    @Mapping(target="images", source="newImages")
     ArticleDto toDto(Article src);
 
     @Mapping(target="boardName", source="board.name")
     @Mapping(target="boardDisplayName", source="board.displayName")
     @Mapping(target="createdAt", qualifiedByName="localDateTimeToHumanFriendlyString")
-    // TODO
-    // 나중엔 newImages -> images로 컬럼 명 자체를 바꿔야할 듯
-    @Mapping(target="images", source="newImages")
     DetailedArticleDto toDetailedDto(Article src);
 
     Article toEntity(ArticleDto src);
