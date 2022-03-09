@@ -45,7 +45,7 @@ public class BlockController {
 
     @DeleteMapping(value = "/api/community/v1/blocks/{id}")
     @ResponseBody
-    @ResponseStatus(code = HttpStatus.CREATED)
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public DefaultResponse<Void> unblockUser(@AuthenticationPrincipal User user, @PathVariable Long id) {
         blockService.unblockUser(user, id);
         return DefaultResponse.<Void>builder()

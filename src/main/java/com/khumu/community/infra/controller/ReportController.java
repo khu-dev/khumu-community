@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReportController {
     final private ReportService reportService;
 
-    @PostMapping(value = "/api/community/v1/report")
+    @PostMapping(value = "/api/community/v1/reports")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.CREATED)
     public DefaultResponse<ReportDto> report(@AuthenticationPrincipal User user, @RequestBody ReportDto reportDto) {

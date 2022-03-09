@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class MyAdvice {
+public class ControllerAdvice {
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<DefaultResponse<Void>> forbiddenException(Exception e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(DefaultResponse.<Void>builder()

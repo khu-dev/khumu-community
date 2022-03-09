@@ -104,7 +104,7 @@ public class ArticleController {
 
     @DeleteMapping(value = "/api/community/v1/articles/{id}")
     @ResponseBody
-    @ResponseStatus(code = HttpStatus.OK)
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public DefaultResponse<Void> delete(@AuthenticationPrincipal User user, @PathVariable Integer id) {
         articleService.delete(user, id);
         return DefaultResponse.<Void>builder()
