@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class BlockController {
     final private BlockService blockService;
 
     @PostMapping(value = "/api/community/v1/blocks")
+    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.CREATED)
     public DefaultResponse<BlockUserDto> blockUser(@AuthenticationPrincipal User user, @RequestBody CreateBlockUserInput body) {
@@ -32,6 +34,7 @@ public class BlockController {
     }
 
     @GetMapping(value = "/api/community/v1/blocks")
+    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.CREATED)
     public DefaultResponse<List<BlockUserDto>> listMyBlocks(
@@ -44,6 +47,7 @@ public class BlockController {
     }
 
     @DeleteMapping(value = "/api/community/v1/blocks/{id}")
+    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public DefaultResponse<Void> unblockUser(@AuthenticationPrincipal User user, @PathVariable Long id) {

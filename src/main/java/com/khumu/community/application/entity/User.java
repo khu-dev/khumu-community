@@ -1,5 +1,6 @@
 package com.khumu.community.application.entity;
 
+import com.khumu.community.application.exception.UnauthenticatedException;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -32,4 +33,10 @@ public class User {
     LocalDateTime info21AuthenticatedAt;
     String status;
     String nickname;
+
+    public static void throwOnUnauthenticated(User user) {
+        if (user == null || user.getUsername() == null) {
+            throw new UnauthenticatedException("인증되지 않은 사용자입니다.");
+        }
+    }
 }
