@@ -10,6 +10,7 @@ import com.khumu.community.application.port.out.repository.UserRepository;
 import com.khumu.community.common.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class UserService {
     private final List<String> cuteAdjectives = List.of("행복한", "열정의", "귀여운", "매력넘치는");
     private final Random random = new Random(System.currentTimeMillis());
     private final MessagePublisher messagePublisher;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserDto create(CreateUserInput input) {
@@ -57,10 +59,10 @@ public class UserService {
 
     private User createGuestUser(CreateUserInput input) {
         String randomNickname = cuteAdjectives.get(random.nextInt(cuteAdjectives.size())) + "게스트#" + random.nextInt(9999) + 1;
-
+        System.out.println(passwordEncoder.encode("123123"));
         return User.builder()
                 .username(randomNickname)
-                .password(input.getPassword())
+                .password(passwordEncoder.encode("123123")) // TODO: 임시 비밀번호
                 .nickname(randomNickname)
                 .kind("guest")
                 .studentNumber("XXXXXXXXXX")

@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class JwtDto {
+public class LoginOutput {
     String access;
     // TODO
     // 아직 refresh logic은 없음
