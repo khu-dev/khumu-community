@@ -53,4 +53,6 @@ public class Article extends BaseEntity {
     String kind;
     @Column(name="is_hot")
     Boolean isHot;
+    @Builder.Default
+    Status status = Status.EXISTS;
 }

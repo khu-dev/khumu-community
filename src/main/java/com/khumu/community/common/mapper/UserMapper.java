@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
         imports={Collectors.class}
 )
 public interface UserMapper {
-    // TODO: 이거 status delete일 때도 생각해야하는데
+    // TODO: 이거 status deleted일 때도 생각해야하는데
     // 영컨의 User가 아니라 간이로 만든 유저가 전달되는 경우도 있음.
     @Mapping(target="status", constant="exists")
     SimpleUserDto toSimpleDto(User src);

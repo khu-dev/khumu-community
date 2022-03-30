@@ -36,6 +36,8 @@ public class ArticleService {
 
     private final MessagePublisher messagePublisher;
 
+    private final List<Status> viewableArticleStatuses = List.of(Status.EXISTS);
+
     @Transactional
     public ArticleDto write(User requestUser, CreateArticleInput input) {
         Article tmp = Article.builder()
@@ -50,7 +52,6 @@ public class ArticleService {
 
         Article article = articleRepository.save(tmp);
 
-        // TODO: 게시글 생성 이벤트를 SNS에 발행하기!
         messagePublisher.publish("article", "create", articleMapper.toEventDto(article));
 
         return articleAdditionalDataInjector.inject(articleMapper.toDto(article), requestUser);
@@ -67,9 +68,10 @@ public class ArticleService {
         // 따라서 non-null인 dummy를 한 칸 넣어준다.
         if (blockedUsernames.isEmpty()) blockedUsernames.add("");
 
-        Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotIn(
+        Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotInAndStatusIn(
                 followingBoards,
                 blockedUsernames,
+                viewableArticleStatuses,
                 pageable
         );
 
@@ -79,7 +81,7 @@ public class ArticleService {
     // 내가 작성한 게시글 조회
     @Transactional
     public Page<ArticleDto> listArticlesIWrote(User requestUser, Pageable pageable) {
-        Page<Article> articles = articleRepository.findAllByAuthor(requestUser, pageable);
+        Page<Article> articles = articleRepository.findAllByAuthorAndStatusIn(requestUser, viewableArticleStatuses, pageable);
 
         return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
     }
@@ -128,7 +130,7 @@ public class ArticleService {
         if (blockedUsernames.isEmpty()) blockedUsernames.add("");
 
         List<Integer> articleIds = commentRepository.findAllArticlesUserCommented(authorizationString, pageable);
-        List<Article> articles = new ArrayList<>(articleRepository.findAllByIdInAndAuthor_UsernameNotIn(articleIds, blockedUsernames, Pageable.unpaged()).getContent());
+        List<Article> articles = new ArrayList<>(articleRepository.findAllByIdInAndAuthor_UsernameNotInAndStatusIn(articleIds, blockedUsernames, viewableArticleStatuses, Pageable.unpaged()).getContent());
         // comment 서비스에서 조회해 온 인덱스 대로 정렬한다.
         // 인덱스에 따라 오름차순 정렬
         articles.sort((Article a, Article b) -> {
@@ -151,7 +153,7 @@ public class ArticleService {
         // 따라서 non-null인 dummy를 한 칸 넣어준다.
         if (blockedUsernames.isEmpty()) blockedUsernames.add("");
 
-        Page<Article> articles = articleRepository.findAllByIsHotAndAuthor_UsernameNotIn(true, blockedUsernames, pageable);
+        Page<Article> articles = articleRepository.findAllByIsHotAndAuthor_UsernameNotInAndStatusIn(true, blockedUsernames, viewableArticleStatuses, pageable);
 
         return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
     }
@@ -166,7 +168,7 @@ public class ArticleService {
         // 따라서 non-null인 dummy를 한 칸 넣어준다.
         if (blockedUsernames.isEmpty()) blockedUsernames.add("");
 
-        Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotIn(List.of(Board.builder().name(board).build()), blockedUsernames, pageable);
+        Page<Article> articles = articleRepository.findAllByBoardInAndAuthor_UsernameNotInAndStatusIn(List.of(Board.builder().name(board).build()), blockedUsernames, viewableArticleStatuses, pageable);
 
         return articleAdditionalDataInjector.inject(articles.map(articleMapper::toDto), requestUser);
     }
@@ -180,7 +182,7 @@ public class ArticleService {
     }
     
     @Transactional
-    // TODO: 기존에는 Patch(부분 수정) 방식이었는데 이거 어떻게 대응해줄 것인가?
+    // TODO: 기존에는 Patch(부분 수정) 방식이었는데 이거 어떻게 대응해줄 것인가? => front에서도 Patch하는 걸로하자.
     // 일단은 null일 수 없는 값들이기때문에 null이면 수정 안하기로.
     public ArticleDto update(User requestUser, Integer id, UpdateArticleInput input) {
 
@@ -218,8 +220,9 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
-    // TODO: 지금은 comment 서비스가 author을 직접 찍어서 보내지만
+    // TODO: 지금은 comment 서비스가 author을 직접 찍어서 확인을 시도하지만
     // 이렇게 되면 보안상 취약하다.
+    // comment 측에서 requestUser를 올바르게 넣어주는 게 베스트!
     public boolean isAuthor(User requestUser, Integer articleId, IsAuthorInput input) {
         Article article = articleRepository.findById(articleId).orElse(null);
         if (article == null) {

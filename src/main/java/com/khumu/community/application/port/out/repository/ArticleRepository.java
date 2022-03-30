@@ -9,17 +9,17 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ArticleRepository extends JpaRepository<Article, Integer> {
-    Page<Article> findAllByAuthor(User author, Pageable pageable);
+    Page<Article> findAllByAuthorAndStatusIn(User author, List<Status> statuses, Pageable pageable);
 
     // 내가 팔로우 중인 Board의 게시글이며
     // 내가 차단하지 않은 작성자의 게시글
     // 을 위함.
-    Page<Article> findAllByBoardInAndAuthor_UsernameNotIn(List<Board> boards, List<String> excludedAuthorUsernames, Pageable pageable);
+    Page<Article> findAllByBoardInAndAuthor_UsernameNotInAndStatusIn(List<Board> boards, List<String> excludedAuthorUsernames, List<Status> statuses, Pageable pageable);
 
-    Page<Article> findAllByIsHotAndAuthor_UsernameNotIn(Boolean isHot, List<String> excludedAuthorUsernames, Pageable pageable);
+    Page<Article> findAllByIsHotAndAuthor_UsernameNotInAndStatusIn(Boolean isHot, List<String> excludedAuthorUsernames, List<Status> statuses, Pageable pageable);
 
-    Page<Article> findAllByIdInAndAuthor_UsernameNotIn(List<Integer> ids, List<String> excludedAuthorUsernames, Pageable pageable);
+    Page<Article> findAllByIdInAndAuthor_UsernameNotInAndStatusIn(List<Integer> ids, List<String> excludedAuthorUsernames, List<Status> statuses, Pageable pageable);
+
+    // 뭐할 때 쓰는 거지
     Page<Article> findAllByIdIn(List<Long> ids, Pageable pageable);
-
-    Page<Article> findAllByIsHot(Boolean isHot, Pageable pageable);
 }
