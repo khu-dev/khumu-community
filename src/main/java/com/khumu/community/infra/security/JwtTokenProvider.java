@@ -46,7 +46,8 @@ public class JwtTokenProvider {
     private String generateToken(Map<String, String> claims, String type, Long expiryDuration) {
         // 여기 value들 한 번 점검해봐야할 듯
         return Jwts.builder()
-                .setHeaderParam("typ", type)
+//                .setHeaderParam("typ", type)
+                .setHeaderParam("typ", "JWT")
                 .setIssuedAt(new Date())
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expiryDuration * 1000 * 30))

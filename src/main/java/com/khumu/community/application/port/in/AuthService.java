@@ -28,12 +28,9 @@ public class AuthService {
             throw new WrongCredentialException();
         }
 
-        Map<String, String> claims = new HashMap<>();
-        claims.put("user_id", user.getUsername());
-        claims.put("nickname", user.getNickname());
-        claims.put("kind", user.getKind());
+
         return LoginOutput.builder()
-                .access(tokenProvider.generateAccessToken(claims))
+                .access(tokenProvider.generateAccessToken(generateClaims(user)))
                 .build();
     }
 
@@ -41,6 +38,23 @@ public class AuthService {
         public WrongCredentialException() {
             super("일치하는 정보의 유저가 존재하지 않습니다.");
         }
+    }
+
+    private String generateFakeJTID() {
+        // django에서 기본적으로 jti(jtid)를 통해 토큰의 고유 아이디를 정의한다.
+        // 하지만 번거로워서 현재는 우선 fake로만 구현.
+        return "fake_jtid";
+    }
+
+    private Map<String, String> generateClaims(User user) {
+        Map<String, String> claims = new HashMap<>();
+        claims.put("user_id", user.getUsername());
+        claims.put("nickname", user.getNickname());
+        claims.put("kind", user.getKind());
+        claims.put("token_type", "access");
+        claims.put("jti", generateFakeJTID());
+
+        return claims;
     }
 
 }

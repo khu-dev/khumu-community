@@ -59,17 +59,17 @@ public class UserService {
 
     private User createGuestUser(CreateUserInput input) {
         String randomNickname = cuteAdjectives.get(random.nextInt(cuteAdjectives.size())) + "게스트#" + random.nextInt(9999) + 1;
-        System.out.println(passwordEncoder.encode("123123"));
+        Group normalGroup = Group.builder().id(2).build();
         return User.builder()
                 .username(randomNickname)
                 .password(passwordEncoder.encode("123123")) // TODO: 임시 비밀번호
                 .nickname(randomNickname)
                 .kind("guest")
-                .studentNumber("XXXXXXXXXX")
+                .studentNumber("2022XXXXXX")
                 .status("exists")
                 .isSuperUser(false)
                 .isActive(true)
-                .groups(List.of(Group.builder().id(1).build()))
+                .groups(List.of(normalGroup))
                 .build();
     }
 }
