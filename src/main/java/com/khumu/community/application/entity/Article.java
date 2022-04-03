@@ -54,5 +54,6 @@ public class Article extends BaseEntity {
     @Column(name="is_hot")
     Boolean isHot;
     @Builder.Default
+    @Enumerated(value = EnumType.STRING)
     Status status = Status.EXISTS;
 }
