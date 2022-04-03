@@ -2,6 +2,7 @@ package com.khumu.community.application.dto.input;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -9,10 +10,11 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class CreateArticleRequest {
+public class CreateArticleInput {
     String title;
     String board;
     String content;
     String kind;
-    List<String> images;
+    @Builder.Default
+    List<String> images = new ArrayList<>();
 }

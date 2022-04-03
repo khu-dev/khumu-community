@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class CommentClient implements CommentRepository {
-//    private final ObjectMapper objectMapper;
     private final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
 
     @Value("${khumu.comment.host}")
@@ -56,7 +55,6 @@ public class CommentClient implements CommentRepository {
         log.info("CommentClient.countByArticle 의 응답: " + resp.getBody());
 
         return resp.getBody().getCommentCount();
-
     }
 
     @Override

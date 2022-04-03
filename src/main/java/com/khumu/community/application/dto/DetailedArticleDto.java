@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class ArticleDto {
+public class DetailedArticleDto {
     Integer id;
     String boardName;
     String boardDisplayName;
@@ -37,6 +37,10 @@ public class ArticleDto {
 
     String kind;
     Boolean isHot;
-    
+
+    // TODO: createdAt을 human readable한 text로
     String createdAt;
+
+    @Builder.Default
+    Boolean isSubscribed = false;
 }

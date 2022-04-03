@@ -1,7 +1,10 @@
 package com.khumu.community.application.entity;
 
 import com.khumu.community.infra.db.JpaConverterJson;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class Article extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +26,18 @@ public class Article extends BaseEntity {
     // LONGTEXT는 VARCHAR가 아닌 Long text로 저장됨.
     @Column(columnDefinition = "LONGTEXT")
     String content;
-    
-    // TODO: new_images -> images colum으로 migrate하기
-    // JPA는 MySQL의 json 컬럼으로는 못 쓰고 Text column을 json 처럼 파싱해서 쓸 수 밖에 없나?
-    @Convert(converter = JpaConverterJson.class)
-    @Column(columnDefinition = "LONGTEXT")
+
+    @Type( type = "json" )
+    @Column( columnDefinition = "json")
     @Builder.Default
-    List<String> newImages = new ArrayList<>();
+    // https://stackoverflow.com/questions/44308167/how-to-map-a-mysql-json-column-to-a-java-entity-property-using-jpa-and-hibernate
+    List<String> images = new ArrayList<>();
+    // 이런 식으로 List<String> 를 표현하려하면 단순 LONGTEXT 타입 컬럼이 되어버림.
+    // JPA는 MySQL의 json 컬럼으로는 못 쓰고 Text column을 json 처럼 파싱해서 쓸 수 밖에 없나?
+//    @Convert(converter = JpaConverterJson.class)
+//    @Column(columnDefinition = "LONGTEXT")
+//    @Builder.Default
+//    List<String> newImages = new ArrayList<>();
     
     // 게시글을 조회할 때는 항상 작성자 정보도 필요하기 때문에
     // 객체 참조를 한다.
@@ -44,4 +53,6 @@ public class Article extends BaseEntity {
     String kind;
     @Column(name="is_hot")
     Boolean isHot;
+    @Builder.Default
+    Status status = Status.EXISTS;
 }

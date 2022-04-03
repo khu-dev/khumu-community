@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
-    final List<String> SKIPPER_URIS = Arrays.asList("/");
+    final List<String> SKIPPER_URIS = Arrays.asList("/", "/api/community/v1/login");
 
 //    public Jws<Claims> getVerifiedJwsFromToken(String token) {
 //        Jws<Claims> jws = jwtUtil.parseToken(token);
