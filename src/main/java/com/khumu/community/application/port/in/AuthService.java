@@ -1,6 +1,8 @@
 package com.khumu.community.application.port.in;
 
 import com.khumu.community.application.dto.LoginOutput;
+import com.khumu.community.application.dto.UserDto;
+import com.khumu.community.application.dto.input.CreateUserInput;
 import com.khumu.community.application.dto.input.LoginInput;
 import com.khumu.community.application.entity.User;
 import com.khumu.community.application.port.out.repository.UserRepository;
@@ -18,16 +20,22 @@ import java.util.Map;
 @Service
 @Slf4j
 public class AuthService {
+    private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
 
     public LoginOutput issueToken(LoginInput body) throws UsernameNotFoundException {
-        User user = userRepository.findById(body.getUsername()).orElseThrow(WrongCredentialException::new);
-        if (!passwordEncoder.matches(body.getPassword(), user.getPassword())) {
-            throw new WrongCredentialException();
+        User user = null;
+        if (body.getCreateGuest() != null && body.getCreateGuest()) {
+            UserDto userDto = userService.create(CreateUserInput.builder().kind("guest").build());
+            user = userRepository.findById(userDto.getUsername()).get();
+        } else{
+            user = userRepository.findById(body.getUsername()).orElseThrow(WrongCredentialException::new);
+            if (!passwordEncoder.matches(body.getPassword(), user.getPassword())) {
+                throw new WrongCredentialException();
+            }
         }
-
 
         return LoginOutput.builder()
                 .access(tokenProvider.generateAccessToken(generateClaims(user)))

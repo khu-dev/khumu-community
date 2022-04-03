@@ -10,4 +10,5 @@ import lombok.*;
 public class LoginInput {
     private String username;
     private String password;
+    private Boolean createGuest;
 }
